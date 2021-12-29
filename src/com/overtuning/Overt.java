@@ -62,8 +62,9 @@ public class Overt {
 	        private String nivel;
 	        private String ph;
 	        private String temperatura;
+	        private String volumen;
 
-	        private lectura(String _Estacion, String _Time, String _Caudal, String _Conductividad, String _Nivel, String _PH, String _Temperatura) {
+	        private lectura(String _Estacion, String _Time, String _Caudal, String _Conductividad, String _Nivel, String _PH, String _Temperatura, String _Volumen ) {
 
 	            estacion = _Estacion;
 	            time = _Time;
@@ -72,6 +73,7 @@ public class Overt {
 	            nivel = _Nivel;
 	            ph = _PH;
 	            temperatura = _Temperatura;
+	            volumen = _Volumen;
 
 	        }
 
@@ -84,7 +86,6 @@ public class Overt {
 	        private estaciones(String _Nombre) {
 
 	            nombre = _Nombre;        
-
 
 	        }
 
@@ -140,7 +141,6 @@ public class Overt {
 	        
 	       try {	    	   
 	    	
-
 	            Class.forName("com.mysql.jdbc.Driver");
 	            Connection connection = DriverManager.getConnection(URL, user, pwd);
 	            CallableStatement statement = connection.prepareCall("{call select_estaciones()}");
@@ -168,7 +168,7 @@ public class Overt {
 	            logger.severe("error connection to GP database server : " + e);	            
 	            SendMail.send_msg("error-etl", "error connection to GP (step 0) database server : " + e); 
 
-	        }	
+	        }
 	       
 	        if(estaciones.size()>0)
 	        {  
@@ -195,13 +195,12 @@ public class Overt {
 		Calendar fecha = Calendar.getInstance();		
         String date_file = String.format("%1$tY%1$tm%1$td_%1$tH%1$tM%1$tS", fecha);		
         PrintWriter pw= new PrintWriter(new File("C:\\datos\\muestras24h\\extraccion_"+date_file+".csv"));
-        StringBuilder sb=new StringBuilder();		
-		/**************************************************************/
-		
+        StringBuilder sb=new StringBuilder();
+        
+		/**************************************************************/		
         System.out.println("dateStart  :"+dateInit);
 		System.out.println("dateFinish :"+dateFinish);
-		System.out.println("Searching entries for " + (estaciones.size()) + " tags..");
-		
+		System.out.println("Searching entries for " + (estaciones.size()) + " tags..");		
 		/**************************************************************/
 		
 	    String URL = "jdbc:sqlserver://sqlsvrccazint01.database.windows.net:1433;";
@@ -228,19 +227,37 @@ public class Overt {
     	 sb.append(",");
     	 sb.append("pH");
     	 sb.append(",");
-    	 sb.append("Temperatura");            	
-    	 sb.append("\r\n");	   
+    	 sb.append("Temperatura");  
+    	 sb.append(",");
+    	 sb.append("Caudal");  
+    	 sb.append("\r\n");	  
+    	 
+    	 
+    	 System.out.println(Utils.get_date_finish());
+    	 System.out.println(Utils.get_date_now());
+    	 System.out.println(Utils.get_date_start());
+    	 System.out.println(Utils.get_date_start_today());
+    	 
+
 	    
 	
 	   try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             Connection con = DriverManager.getConnection(connectionUrl);
             Statement stmt = con.createStatement();
-            for (int i = 0; i <= estaciones.size() - 1; i++) {
-                 encountered = 0;
-                 SQL = "select  IDEstacion, TIMESTAMP,Caudal,Conductividad,Nivel,PH,Temperatura from dbo.PozosSMA_GPConsultores  where TIMESTAMP >= '"+dateInit+"' AND  TIMESTAMP <=  '"+dateFinish+"' AND IDEstacion = '"+estaciones.get(i).nombre+"';";
-                 ResultSet rs = stmt.executeQuery(SQL);
-                while (rs.next()) {
+            for (int i = 0; i <= estaciones.size() - 1; i++)
+            {
+                encountered = 0;
+                /*Daemon 0*/
+               // SQL = "select  IDEstacion, TIMESTAMP,Caudal,Conductividad,Nivel,PH,Temperatura,VA from dbo.PozosSMA_GPConsultores  where TIMESTAMP >= '"+dateInit+"' AND  TIMESTAMP <=  '"+dateFinish+"' AND IDEstacion = '"+estaciones.get(i).nombre+"';";
+                /*Daemon 1*/
+              
+                
+                SQL = "select  IDEstacion, TIMESTAMP,Caudal,Conductividad,Nivel,PH,Temperatura,VA from dbo.PozosSMA_GPConsultores  where TIMESTAMP >= '"+Utils.get_date_start()+"' AND  TIMESTAMP <=  '"+Utils.get_date_start_today()+"' AND IDEstacion = '"+estaciones.get(i).nombre+"';";
+                
+                ResultSet rs = stmt.executeQuery(SQL);
+                while (rs.next())
+                {
                 	
                 	 sb.append(rs.getString(1));
                 	 sb.append(",");
@@ -254,15 +271,15 @@ public class Overt {
                 	 sb.append(",");
                 	 sb.append(rs.getString(6));
                 	 sb.append(",");
-                	 sb.append(rs.getString(7));            	
-                	 sb.append("\r\n");
-                    
-                	 lecturas.add(new lectura(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7)));                   
-                                     
-                    encountered++;
+                	 sb.append(rs.getString(7));
+                	 sb.append(",");
+                	 sb.append(rs.getString(8));
+                	 sb.append("\r\n");                    
+                	 lecturas.add(new lectura(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7),rs.getString(8)));                   
+                     encountered++;
                 }
                
-                System.out.println("Searching entries for " +estaciones.get(i).nombre + " >" + dateInit + " & <"+ dateFinish +" Process => " + Utils.percentage(i, estaciones.size() - 1) + " Result => " + encountered);
+                System.out.println("Searching entries for " +estaciones.get(i).nombre + " >" + Utils.get_date_start() + " & <"+ Utils.get_date_start_today()+" Process => " + Utils.percentage(i, estaciones.size() - 1) + " Result => " + encountered);
             }
             pw.write(sb.toString());
             pw.close();
@@ -298,30 +315,29 @@ public class Overt {
 	        Logger logger = Logger.getLogger("etl_log");   	     
 	        String URL = "jdbc:mysql://gpcumplimiento.cl:3306/gpcumpli_enlinea?noAccessToProcedureBodies=true&autoReconnect=true&useSSL=false";
 	        String user = "gpcumpli_admin";
-	        String pwd = "30cuY2[OAgAr";
-	        
-	        int errores = 0;
-	        
+	        String pwd = "30cuY2[OAgAr";	        
+	        int errores = 0;	        
 	        
 	        try {
 
 	            Class.forName("com.mysql.jdbc.Driver");
 	            Connection connection = DriverManager.getConnection(URL, user, pwd);
 	            logger.info("transforming & sending data encountered to gpserver...");         
-	            CallableStatement statement = connection.prepareCall("{call db_update(?, ?, ?, ?, ?, ? ,?, ?)}");           
+	            CallableStatement statement = connection.prepareCall("{call db_update(?, ?, ?, ?, ?, ? ,?, ?, ?)}");           
 	      
 	            for (int i = 0; i <= lecturas.size() - 1; i++) {
-
-	                System.out.println("processing... " + i + " of " + (lecturas.size() - 1) + " tasks " + Utils.percentage(i, lecturas.size() - 1));	                
-	    
-	                statement.setString(1, lecturas.get(i).estacion);
-	                statement.setString(2, lecturas.get(i).time );
-	                statement.setString(3, Utils.get_date_lector());
-	                statement.setString(4, Utils.convert_2f(lecturas.get(i).ph));
-	                statement.setString(5, Utils.convert_ce(lecturas.get(i).conductividad));
-	                statement.setString(6, Utils.convert_2f(lecturas.get(i).temperatura));
-	                statement.setString(7, Utils.convert_2f(lecturas.get(i).caudal));
-	                statement.setString(8, Utils.convert_2f(lecturas.get(i).nivel));	                
+                        /***********************************************************************************************************************************/
+		                /**/System.out.println("processing... " + i + " of " + (lecturas.size() - 1) + " tasks " + Utils.percentage(i, lecturas.size() - 1));              
+		                /***********************************************************************************************************************************/
+		                statement.setString(1, lecturas.get(i).estacion);
+		                statement.setString(2, lecturas.get(i).time );
+		                statement.setString(3, Utils.get_date_lector());
+		                statement.setString(4, Utils.convert_2f(lecturas.get(i).ph));
+		                statement.setString(5, Utils.convert_ce(lecturas.get(i).conductividad));
+		                statement.setString(6, Utils.convert_2f(lecturas.get(i).temperatura));
+		                statement.setString(7, Utils.convert_2f(lecturas.get(i).caudal));
+		                statement.setString(8, Utils.convert_2f(lecturas.get(i).nivel));
+		                statement.setString(9, Utils.convert_2f(lecturas.get(i).volumen));
 
 	                try
 	                {
@@ -368,7 +384,6 @@ public class Overt {
 	 
 		 public static void show_data_server(List < lectura > lecturas)
 		 {
-		
 		        for (int i = 0; i <= lecturas.size() - 1; i++)
 		        {
 	
