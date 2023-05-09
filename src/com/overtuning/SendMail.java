@@ -34,7 +34,7 @@ public class SendMail {
 	            message.setFrom(new InternetAddress("gp@gpconsultores.cl"));
 	            message.setRecipients(
 	                    Message.RecipientType.TO,
-	                    InternetAddress.parse("erivas@gpconsultores.cl, ing.eliorivas@gmail.com")
+	                    InternetAddress.parse("erivas@gpconsultores.cl, cgonzalez@gpconsultores.cl")
 	            );
 	            message.setSubject(subject);
 	            message.setText(text);
