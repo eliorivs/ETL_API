@@ -130,21 +130,7 @@ public class Overt {
 
 	    }
 	  
-	  class MYSQL{
-		  
-		  /* String URL = "jdbc:mysql://gpcumplimiento.cl:3306/gpcumpli_enlinea?noAccessToProcedureBodies=true&autoReconnect=true&useSSL=false";
-	        String user = "gpcumpli_admin";
-	        String pwd = "30cuY2[OAgAr";*/
-		  
-		  /*static final  String URL = "jdbc:mysql://127.0.0.1:3306/gpcumpli_enlinea?noAccessToProcedureBodies=true&autoReconnect=true&useSSL=false";
-		  static final  String user = "root";
-		  static final  String pwd = "";*/
-		  
-			  static final  String URL = "jdbc:mysql://gpcumplimiento.cl:3306/gpcumpli_bombeosld?noAccessToProcedureBodies=true&autoReconnect=true&useSSL=false";
-			  static final  String user = "gpcumpli_admin";
-			  static final  String pwd = "30cuY2[OAgAr";		  
-			  static final  String clase="com.mysql.jdbc.Driver";
-	   }
+	 
 	  
 	 
 	public static void main(String[] args) throws SecurityException, IOException ,JSONException {
@@ -176,7 +162,7 @@ public class Overt {
 		 try {
 			    System.out.println("Connecting to Web Service...");
 			    logger.info("Connecting to web service...");			
-			    String url ="https://gpconsultores.cl/PDC_ONLINE/backend/ultimas_lecturas.php";
+			    String url =Credenciales.ENPOINTS.json;
 			    logger.info("estableciendo conexion con "+ url);
 			    JSONObject json = readJsonFromUrl(url);
 			    JSONArray jsonArray =  json.getJSONArray("lecturas");	    
@@ -259,8 +245,8 @@ public class Overt {
 	   	    
 	       try {	    	   
 	    	
-	            Class.forName(MYSQL.clase);
-	            Connection connection = DriverManager.getConnection(MYSQL.URL, MYSQL.user, MYSQL.pwd);
+	            Class.forName(Credenciales.MYSQL.clase);
+	            Connection connection = DriverManager.getConnection(Credenciales.MYSQL.URL, Credenciales.MYSQL.user, Credenciales.MYSQL.pwd);
 	            CallableStatement statement = connection.prepareCall("{call ultimas_lecturas()}");
 	            boolean hasResults = statement.execute();
 	            if (hasResults) {
@@ -464,8 +450,6 @@ public class Overt {
 	        
 	          try{
 		        	   Class.forName(Credenciales.MYSQL.clase);		      
-			   
-			           /*Connection con = DriverManager.getConnection(MYSQL.URL, MYSQL.user, MYSQL.pwd);*/
 			           Connection connection = DriverManager.getConnection(Credenciales.MYSQL.URL,Credenciales.MYSQL.user, Credenciales.MYSQL.pwd);
 			           Statement stmt = connection.createStatement();
 			           SQL = "select * from notificaciones";
