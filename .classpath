@@ -6,10 +6,11 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/ingel/Desktop/java/javax.activation-1.2.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/ingel/Desktop/java/javax.mail.jar"/>
-	<classpathentry kind="lib" path="C:/Users/ingel/Desktop/java/java/sqljdbc_6.0.8112.200_enu/sqljdbc_9.4.0.0_enu/sqljdbc_9.4/enu/mssql-jdbc-9.4.0.jre8.jar"/>
-	<classpathentry kind="lib" path="C:/Users/ingel/Desktop/java/mysql-connector-java-5.1.46/mysql-connector-java-5.1.46/mysql-connector-java-5.1.46-bin.jar"/>
-	<classpathentry kind="lib" path="C:/Users/ingel/Desktop/java/org.json.jar"/>
+	<classpathentry kind="lib" path="C:/Users/erivas/Downloads/jar_files (1)/mysql-connector-java-5.1.46.jar"/>
+	<classpathentry kind="lib" path="C:/Users/erivas/Downloads/jar_files (2)/json-20230227.jar"/>
+	<classpathentry kind="lib" path="C:/Users/erivas/Downloads/javax.mail.jar"/>
+	<classpathentry kind="lib" path="C:/Users/erivas/Downloads/jar_files/activation-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/erivas/Downloads/jar_files/javax.mail-1.6.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/erivas/Downloads/mssql-jdbc-9.4.0.jre8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

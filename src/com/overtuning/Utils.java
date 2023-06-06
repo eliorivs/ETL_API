@@ -81,5 +81,10 @@ public class Utils {
 	  		  String actual_date = String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", fecha);    	
 	  		  return actual_date;    
 		}
+		
+		public java.sql.Date convertJavaDateToSqlDate(java.util.Date date)
+		{
+		    return new java.sql.Date(date.getTime());
+		}
 
 }
