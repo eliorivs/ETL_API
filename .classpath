@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="C:/Users/erivas/Downloads/jar_files/activation-1.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/erivas/Downloads/jar_files/javax.mail-1.6.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/erivas/Downloads/mssql-jdbc-9.4.0.jre8.jar"/>
+	<classpathentry kind="lib" path="C:/Users/erivas/Downloads/gson-2.10.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

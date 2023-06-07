@@ -25,10 +25,28 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
+import com.google.gson.Gson;
+
 import com.overtuning.Overt.estaciones;
 import com.overtuning.Overt.lectura;
+import com.overtuning.Serialize.Serials;
+
+
+
+
+
 
 public class Transaccion {
+	
+	
+	
 	
 	
 	
@@ -83,7 +101,7 @@ public class Transaccion {
 		 try {
 			    System.out.println("Connecting to Web Service...");
 			    logger.info("Connecting to web service...");			
-			    String url =Credenciales.ENPOINTS.json;
+			    String url =Credenciales.ENDPOINTS.json;
 			    logger.info("estableciendo conexion con "+ url);
 			    JSONObject json = Overt.readJsonFromUrl(url);			
 			    JSONArray jsonArray =  json.getJSONArray("lecturas");	    
@@ -114,8 +132,7 @@ public class Transaccion {
 				 System.out.println("here we go!");
 				 System.out.println("econtradas "+ estaciones.size() +" rows via api ");
 				 logger.severe("econtradas "+ estaciones.size() +" rows via api ");
-				 Extraccion.busqueda_lecturas(estaciones);
-				
+				 Extraccion.busqueda_lecturas(estaciones);				
 			 
 	        	  
 	        }
@@ -129,12 +146,73 @@ public class Transaccion {
 		 
 	}
 	
+	public static String ifNull(String variable)
+	{
+	    if(variable == null)
+	    {
+	        variable ="";
+	    	
+	    }	  
+	    return variable;
+	    
+	   
+	}
+	
+	
+	public static  void GenerateJson(String estacion, String MachineTime,String pH, String Timestamp ,String Conductividad, String Temperatura, String Caudal, String Nivel, String Volumen) throws IOException
+	{
+		StringBuilder postDataBuilder = new StringBuilder();
+        postDataBuilder.append("{");
+        postDataBuilder.append("\"estacion\":\"" + estacion + "\",");
+        postDataBuilder.append("\"horaMaquina\":\"" + MachineTime + "\",");
+        postDataBuilder.append("\"timestamp\":\"" + Timestamp+ "\",");
+        postDataBuilder.append("\"pH\":\"" + ifNull(pH) + "\",");
+        postDataBuilder.append("\"conductividad\":\"" + ifNull(Conductividad) + "\",");
+        postDataBuilder.append("\"temperatura\":\"" + ifNull(Temperatura) + "\",");
+        postDataBuilder.append("\"caudal\":\"" + ifNull(Caudal) + "\",");
+        postDataBuilder.append("\"nivel\":\"" + ifNull(Nivel)+ "\",");
+        postDataBuilder.append("\"volumen\":\"" + ifNull(Volumen) + "\"");
+        postDataBuilder.append("}");        
+        String postData = postDataBuilder.toString();
+        System.out.println("Posteando =>");
+        System.out.println(postData);
+        PostearJson(postData);        
+		
+	}
+	public static  void PostearJson(String postData) throws IOException
+	{
+		String URL =  Credenciales.ENDPOINTS.post;
+		URL obj = new URL(URL);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setDoOutput(true);       
+  
+        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        wr.write(postData.getBytes(StandardCharsets.UTF_8));
+        wr.flush();
+        wr.close();
+
+        int responseCode = con.getResponseCode();
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();  
+        System.out.println("Respuesta del servidor:");
+        System.out.println(response.toString());
+		
+		
+	}
+	
 	
 	public static void ComunicationWS(String estacion, String MachineTime,String pH, String Timestamp ,String Conductividad, String Temperatura, String Caudal, String Nivel, String Volumen) throws IOException
 	{
 		    Logger logger = Logger.getLogger("etl_log");  
-			URL url = new URL(Credenciales.ENPOINTS.post);	
-			
+			URL url = new URL(Credenciales.ENDPOINTS.post);				
 	        Map<String, Object> params = new LinkedHashMap<String, Object>();
 	        params.put("estacion", estacion);
 	        params.put("horaMaquina", MachineTime);
@@ -177,14 +255,12 @@ public class Transaccion {
 			
 	        Logger logger = Logger.getLogger("etl_log");   
 	       	int errores = 0;	
-	       	URL url = new URL("https://gpconsultores.cl/PDC_ONLINE/backend/post.php");
+	       	URL url = new URL(Credenciales.ENDPOINTS.post);
 	       	System.out.println("enviando a WebService "+url);
 	        logger.info("Enviado a WebService..." );
 	        for (int i = 0; i <= lecturas.size() - 1; i++)
 	        {
-	        	 
-	        	
-	        	 ComunicationWS(lecturas.get(i).estacion,Utils.get_date_lector(),lecturas.get(i).ph,lecturas.get(i).time,lecturas.get(i).conductividad,lecturas.get(i).temperatura,lecturas.get(i).caudal,lecturas.get(i).nivel,lecturas.get(i).volumen);
+	        	GenerateJson(lecturas.get(i).estacion,Utils.get_date_lector(),lecturas.get(i).ph,lecturas.get(i).time,lecturas.get(i).conductividad,lecturas.get(i).temperatura,lecturas.get(i).caudal,lecturas.get(i).nivel,lecturas.get(i).volumen);
 	        }
 	   	    System.out.println("Finish");
 	   	    logger.info("End.... See you later.");	       	

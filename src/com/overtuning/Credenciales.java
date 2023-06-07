@@ -19,10 +19,13 @@ public class Credenciales {
 			  static final  String pwd = "30cuY2[OAgAr";		  
 			  static final  String clase="com.mysql.jdbc.Driver";
 	   }
-      class ENPOINTS {
+      class ENDPOINTS {
     	  
-    	  static final  String json ="https://gpconsultores.cl/PDC_ONLINE/backend/ultimas_lecturas.php";
-    	  static final  String post ="https://gpconsultores.cl/PDC_ONLINE/backend/post.php";
+    	 /* static final  String json ="https://gpconsultores.cl/PDC_ONLINE/backend/ultimas_lecturas.php";*/
+    	  static final  String json ="http://localhost/serverdb/show";    	  
+    	 /* static final  String post ="https://gpconsultores.cl/PDC_ONLINE/backend/post.php";*/
+    	  static final  String post ="http://localhost/serverdb/save";
+    	  
     	  
     	  
       }
